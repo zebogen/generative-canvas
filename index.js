@@ -17,18 +17,39 @@ function init() {
 
 function tick() {
   if (state.running) {
-    state.agents.forEach(agent => agent.tick());
+    const newBranches = [];
+    state.agents.forEach((agent) => {
+      agent.tick();
+      if (Math.random() < .01) {
+        newBranches.push(new Agent({ x: agent.x, y: agent.y, color: agent.color }));
+      }
+    });
+
+    state.agents.push(...newBranches);
   }
 
   requestAnimationFrame(() => tick());
 }
-
+//
+// Button actions
+//
 function start() {
   state.running = true;
 }
 
 function stop() {
   state.running = false;
+}
+
+function reset() {
+  state = getInitialState();
+  document.getElementById('image-preview').classList.add('hidden');
+  canvas.getContext('2d').clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+}
+
+function saveImage() {
+  document.getElementById('canvas-image-download').src = canvas.toDataURL();
+  document.getElementById('image-preview').classList.remove('hidden');
 }
 
 function getInitialState() {
@@ -40,12 +61,12 @@ function getInitialState() {
 
 const LINE_TICK_SIZE = 2;
 
-function Agent() {
-  this.x = Math.random() * CANVAS_WIDTH;
-  this.y = Math.random() * CANVAS_HEIGHT;
-  this.angle = Math.random() * 2 * Math.PI;
-  this.angleChangeProbability = Math.random() / 5;
-  this.color = `rgb(
+function Agent(options = {}) {
+  this.x = options.x || Math.random() * CANVAS_WIDTH;
+  this.y = options.y || Math.random() * CANVAS_HEIGHT;
+  this.angle = options.angle || Math.random() * 2 * Math.PI;
+  this.angleChangeProbability = options.angleChangeProbability || Math.random() / 5;
+  this.color = options.color || `rgb(
     ${Math.floor(Math.random() * 255)},
     ${Math.floor(Math.random() * 255)},
     ${Math.floor(Math.random() * 255)}
@@ -78,6 +99,10 @@ Agent.prototype.updateAngle = function() {
   this.angle = Math.random() < .5
     ? this.angle + angleDelta
     : this.angle - angleDelta;
+}
+
+Agent.prototype.branch = function() {
+
 }
 
 //

@@ -14,6 +14,18 @@
       button {
         margin-top: 10px;
       }
+
+      .hidden {
+        display: none;
+      }
+
+      #image-preview {
+        margin-top: 20px;
+      }
+
+      #canvas-image-download {
+        border: 2px solid blue;
+      }
     </style>
   </head>
   <body>
@@ -22,6 +34,12 @@
       <div>
         <button type="button" onclick="start()">Start</button>
         <button type="button" onclick="stop()">Stop</button>
+        <button type="button" onclick="reset()">Reset</button>
+        <button type="button" onclick="saveImage()">Save Image</button>
+      </div>
+      <div id="image-preview" class="hidden">
+        <p>Right click image to save:</p>
+        <img id="canvas-image-download" />
       </div>
     </div>
   </body>

@@ -21,7 +21,13 @@ function tick() {
     state.agents.forEach((agent) => {
       agent.tick();
       if (Math.random() < .01) {
-        newBranches.push(new Agent({ x: agent.x, y: agent.y, color: agent.color }));
+        newBranches.push(
+          new Agent({
+            x: agent.x,
+            y: agent.y,
+            color: chanceEvent(.2, () => randomColor(), () => agent.color),
+          })
+        );
       }
     });
 
@@ -47,11 +53,6 @@ function reset() {
   canvas.getContext('2d').clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 }
 
-function saveImage() {
-  document.getElementById('canvas-image-download').src = canvas.toDataURL();
-  document.getElementById('image-preview').classList.remove('hidden');
-}
-
 function getInitialState() {
   return {
     running: false,
@@ -66,11 +67,7 @@ function Agent(options = {}) {
   this.y = options.y || Math.random() * CANVAS_HEIGHT;
   this.angle = options.angle || Math.random() * 2 * Math.PI;
   this.angleChangeProbability = options.angleChangeProbability || Math.random() / 5;
-  this.color = options.color || `rgb(
-    ${Math.floor(Math.random() * 255)},
-    ${Math.floor(Math.random() * 255)},
-    ${Math.floor(Math.random() * 255)}
-  )`;
+  this.color = options.color || randomColor();
 }
 
 Agent.prototype.tick = function() {
@@ -91,18 +88,20 @@ Agent.prototype.tick = function() {
   this.x = loopX ? 0 : newX;
   this.y = loopY ? 0 : newY;
 
-  if (Math.random() < this.angleChangeProbability) this.updateAngle();
+  chanceEvent(this.angleChangeProbability, () => this.updateAngle());
 }
 
 Agent.prototype.updateAngle = function() {
   const angleDelta = Math.random() * Math.PI / 4;
-  this.angle = Math.random() < .5
-    ? this.angle + angleDelta
-    : this.angle - angleDelta;
+  const sign = chanceEvent(.5, () => 1, () => -1);
+  this.angle = this.angle + (angleDelta * sign);
 }
 
-Agent.prototype.branch = function() {
-
+Agent.prototype.updateColor = function() {
+  for (let key in this.color) {
+    const factor = .9 + (Math.random() / 5);
+    this.color[key] = Math.round(this.color[key] * factor);
+  }
 }
 
 //
@@ -114,6 +113,19 @@ function drawLine(startX, startY, endX, endY, color) {
   ctx.beginPath();
   ctx.moveTo(startX, startY);
   ctx.lineTo(endX, endY);
-  ctx.strokeStyle = color;
+  const { r, g, b } = color;
+  ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
   ctx.stroke();
+}
+
+function chanceEvent(value, hitFn, missFn = () => {}) {
+  return Math.random() < value ? hitFn() : missFn();
+}
+
+function randomColor(upperBound = 255) {
+  return {
+    r: Math.round(Math.random() * upperBound),
+    g: Math.round(Math.random() * upperBound),
+    b: Math.round(Math.random() * upperBound)
+  };
 }

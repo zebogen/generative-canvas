@@ -15,30 +15,40 @@
         margin-top: 10px;
       }
 
-      .hidden {
-        display: none;
-      }
-
-      #image-preview {
-        margin-top: 20px;
-      }
-
-      #canvas-image-download {
-        border: 2px solid blue;
+      .fields > .option:not(:last-child) {
+        margin-bottom: 10px;
       }
     </style>
   </head>
   <body>
     <div style="text-align: center">
+      <h1>Branching Line Generator</h1>
       <canvas id="root"></canvas>
       <div>
         <button type="button" onclick="start()">Start</button>
         <button type="button" onclick="stop()">Stop</button>
         <button type="button" onclick="reset()">Reset</button>
       </div>
-      <div id="image-preview" class="hidden">
-        <p>Right click image to save:</p>
-        <img id="canvas-image-download" />
+      <div class="fields">
+        <h3>Options</h3>
+        <div class="option">
+          <label>
+            # of agents
+          </label>
+          <input type="number" id="number-of-agents" value="5" />
+        </div>
+        <div class="option">
+          <label>
+            Branch probability
+          </label>
+          <input type="number" id="branch-probability" value=".01" step=".001" />
+        </div>
+        <div class="option">
+          <label>
+            Angle change probability
+          </label>
+          <input type="number" id="angle-change-probability" value=".1" step=".01" />
+        </div>
       </div>
     </div>
   </body>

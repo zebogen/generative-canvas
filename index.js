@@ -1,16 +1,24 @@
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 800;
 
-let state, canvas;
+let state, canvas, userOptionNodes;
 
 document.addEventListener('DOMContentLoaded', () => init());
+
+
 
 function init() {
   canvas = document.getElementById('root');
   canvas.width = CANVAS_WIDTH;
   canvas.height = CANVAS_HEIGHT;
 
-  state = getInitialState()
+  userOptionNodes = {
+    numberOfAgents: document.getElementById('number-of-agents'),
+    angleChangeProbability: document.getElementById('angle-change-probability'),
+    branchProbability: document.getElementById('branch-probability'),
+  };
+
+  state = getInitialState();
 
   tick();
 }
@@ -18,9 +26,10 @@ function init() {
 function tick() {
   if (state.running) {
     const newBranches = [];
+    const branchProbability = parseFloat(userOptionNodes.branchProbability.value);
     state.agents.forEach((agent) => {
       agent.tick();
-      if (Math.random() < .01) {
+      if (Math.random() < branchProbability) {
         newBranches.push(
           new Agent({
             x: agent.x,
@@ -49,14 +58,20 @@ function stop() {
 
 function reset() {
   state = getInitialState();
-  document.getElementById('image-preview').classList.add('hidden');
   canvas.getContext('2d').clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 }
 
 function getInitialState() {
+  const { angleChangeProbability, numberOfAgents } = userOptionNodes;
+
   return {
     running: false,
-    agents: Array.from({ length: 10 }, () => new Agent()),
+    agents: Array.from(
+      { length: parseInt(numberOfAgents.value) || 10 },
+      () => new Agent({
+        angleChangeProbability: angleChangeProbability.value,
+      })
+    )
   };
 }
 
